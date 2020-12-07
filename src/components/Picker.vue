@@ -6,7 +6,7 @@
         :color="color"
         :categories="categories"
         :active-category="activeCategory"
-        @click="onAnchorClick"
+        @change="onAnchorClick"
       />
     </div>
 
@@ -19,7 +19,6 @@
     >
       <search
         v-if="showSearch"
-        ref="search"
         :data="data"
         :i18n="mergedI18n"
         :auto-focus="autoFocus"
@@ -53,7 +52,6 @@
         <DynamicScrollerItem :item="item" :active="active" :data-index="index">
           <Category
             v-show="true"
-            ref="categories"
             :i18n="item.mergedI18n"
             :id="item.category.id"
             :name="item.category.name"
@@ -144,7 +142,7 @@ const I18N = {
 }
 
 export default defineComponent({
-  name: 'EmojiPicker',
+  name: 'Picker',
 
   props: {
     ...PickerProps,
@@ -259,12 +257,12 @@ export default defineComponent({
       }
     }
     const onAnchorClick = (category) => {
-      let i = categories.indexOf(category)
+      let i = categories.findIndex(e => e.id === category.id)
       if (dynScrollerRef.value) {
         dynScrollerRef.value.scrollToItem(i)
       }
 
-      activeCategory.value = categories[i]
+      activeCategory.value = categories.find(e => e.id === category.id)
       skipScrollUpdate = true
     }
     const onSearch = (value) => {

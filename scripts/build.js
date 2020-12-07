@@ -84,7 +84,7 @@ module.exports = (options) => {
       datum.keywords = emojiLib.lib[datum.short_name].keywords
     }
 
-    if (datum.category != 'Skin Tones') {
+    if (datum.category !== 'Skin Tones') {
       categoryIndex = categoriesIndex[category]
       if (!data.categories[categoryIndex]) {
         throw Error(`Missing category: ${categoryIndex}, ${category}`)
@@ -94,7 +94,7 @@ module.exports = (options) => {
     }
 
     datum.short_names.forEach((short_name, i) => {
-      if (i == 0) {
+      if (i === 0) {
         return
       }
 
@@ -116,7 +116,7 @@ module.exports = (options) => {
   flags.emojis = flags.emojis
     .filter((flag) => {
       // Until browsers support Flag UN
-      if (flag == 'flag-un') return
+      if (flag === 'flag-un') return
       return true
     })
     .sort()

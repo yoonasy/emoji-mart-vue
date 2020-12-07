@@ -30,6 +30,8 @@
     "vue": "^2.0.0"
   },
   "devDependencies": {
+    "sass": "^1.28.0",
+    "sass-loader": "^9.0.3",
     "@babel/core": "7.3.4",
     "@babel/plugin-transform-runtime": "7.3.4",
     "@babel/preset-env": "7.3.4",
@@ -54,9 +56,9 @@
     "vue-jest": "^5.0.0-0",
     "vue-loader": "^16.1.1",
     "vue-style-loader": "^4.1.2",
-    "webpack": "^5.10.0",
-    "webpack-cli": "^4.2.0",
-    "webpack-dev-server": "^4.0.0-beta.0"
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1"
   },
   "scripts": {
     "clean": "rm -rf dist/",
@@ -66,7 +68,7 @@
     "build:dist-stats": "webpack --config src/webpack.config.js --profile --json > stats.json",
     "build:docs": "webpack --config docs/webpack.config.js",
     "build": "npm run clean && npm run build:data && npm run build:dist",
-    "dev:docs": "webpack -w --config docs/webpack.config.js",
+    "dev:docs": "cd docs && vue-cli-service serve",
     "start": "npm run dev:docs",
     "stats": "webpack --config ./spec/webpack.config.js --json > spec/stats.json",
     "size-limit": "size-limit",

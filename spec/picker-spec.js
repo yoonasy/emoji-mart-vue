@@ -163,6 +163,25 @@ describe('anchors', () => {
       'Custom',
     ])
   })
+})
+
+describe('anchors', () => {
+  let index = new EmojiIndex(data, {
+    custom: [
+      {
+        name: 'Octocat',
+        short_names: ['octocat'],
+        keywords: ['github'],
+        imageUrl:
+          'https://github.githubassets.com/images/icons/emoji/octocat.png',
+      },
+    ],
+  })
+  const picker = mount(Picker, {
+    propsData: {
+      data: index,
+    },
+  })
 
   it('can be clicked to scroll to the category', async () => {
     let anchors = picker.findComponent(Anchors)
@@ -172,15 +191,14 @@ describe('anchors', () => {
     expect(symbols.element.attributes['data-title'].value).toBe('Symbols')
 
     await symbols.trigger('click')
-    let events = anchors.emitted().click
+    let events = anchors.emitted().change
     expect(events.length).toBe(1)
     let category = events[0][0]
     expect(category.id).toBe('symbols')
     expect(category.name).toBe('Symbols')
 
     await anchors.vm.$nextTick()
-    console.log(anchors.vm.activeCategory.id)
-    // expect(anchors.vm.activeCategory.id).toBe('symbols')
+    expect(anchors.vm.activeCategory.id).toBe('symbols')
   })
 })
 
@@ -239,9 +257,12 @@ describe('emjoi tooltip', () => {
     },
   })
 
-  it('emoji title is set to emoji id when emojiTooltip is true', () => {
-    picker.setProps({ emojiTooltip: true })
+  it('emoji title is set to emoji id when emojiTooltip is true', async (done) => {
+    await picker.setProps({ emojiTooltip: false })
+
     let emoji = picker.find('[data-title="+1"]')
+
+    console.log(emoji.html())
     expect(emoji.element.title).toBe('+1')
   })
 

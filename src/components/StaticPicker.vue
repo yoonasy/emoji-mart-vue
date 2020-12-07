@@ -170,7 +170,7 @@ export default defineComponent({
     })
 
     categories[0].first = true
-    Object.freeze(this.categories)
+    Object.freeze(categories)
 
     const scrollRef = ref(null)
     const categoriesRef = ref(null)
@@ -312,7 +312,7 @@ export default defineComponent({
       customStyles,
       filteredCategories,
       skinProps,
-      mergedI18n: () => Object.freeze(deepMerge(I18N, props.i18n)),
+      mergedI18n: computed(() => Object.freeze(deepMerge(I18N, props.i18n))),
       idleEmoji,
 
       scrollRef,

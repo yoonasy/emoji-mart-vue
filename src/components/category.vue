@@ -5,7 +5,7 @@
     <span>{{ i18n.categories[id] }}</span>
   </div>
 
-  <template v-for="{ emojiObject, emojiView} in emojiObjects">
+  <template v-for="{ emojiObject, emojiView } in emojiObjects">
     <span
       v-if="emojiView.canRender"
       :data-title="emojiObject.short_name"

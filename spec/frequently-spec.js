@@ -1,21 +1,26 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 
+import './polyfill/IntersectionObserver'
 import { Picker, Category } from '../src/components'
 import data from '../data/all.json'
 import { EmojiIndex } from '../src/utils/emoji-data'
 
 describe('Picker frequnt category', () => {
   let index = new EmojiIndex(data)
+
   const picker = mount(Picker, {
     propsData: {
       data: index,
     },
+    // global: {
+    //   stubs: ['DynamicScroller', 'DynamicScrollerItem']
+    // }
   })
 
   it('Has default emojis initially', () => {
-    let categories = picker.findAll(Category)
-    expect(categories.at(1).vm.name).toBe('Recent')
-    expect(categories.at(1).vm.emojis.length).toBe(16)
+    let categories = picker.findAllComponents(Category)
+    expect(categories[1].vm.name).toBe('Recent')
+    expect(categories[1].vm.emojis.length).toBe(16)
 
     const DEFAULTS = [
       '+1',
@@ -36,8 +41,8 @@ describe('Picker frequnt category', () => {
       'hankey',
     ]
 
-    for (let idx in categories.at(1).vm.emojis) {
-      let emoji = categories.at(1).vm.emojis[idx]
+    for (let idx in categories[1].vm.emojis) {
+      let emoji = categories[1].vm.emojis[idx]
       expect(emoji.id).toBe(DEFAULTS[idx])
     }
   })
@@ -48,6 +53,7 @@ describe('Picker frequnt category', () => {
       space_invader: 24,
       robot_face: 23,
     }
+
     for (let id in testClicks) {
       let emoji = picker.find(`[data-title="${id}"]`)
       let numClicks = testClicks[id]
@@ -59,6 +65,7 @@ describe('Picker frequnt category', () => {
     expect(window.localStorage['emoji-mart.last']).toBe(
       JSON.stringify('robot_face'),
     )
+
     expect(window.localStorage['emoji-mart.frequently']).toEqual(
       JSON.stringify({
         '+1': 16,
@@ -91,9 +98,9 @@ describe('Picker frequnt category', () => {
       },
     })
     // Wait for picker to be rendered.
-    picker.vm.$nextTick(() => {
-      let categories = newPicker.findAll(Category)
-      let recent = categories.at(1).vm
+    flushPromises().then(() => {
+      let categories = newPicker.findAllComponents(Category)
+      let recent = categories[1].vm
 
       expect(recent.emojis[0].id).toBe('nerd_face')
       expect(recent.emojis[1].id).toBe('space_invader')

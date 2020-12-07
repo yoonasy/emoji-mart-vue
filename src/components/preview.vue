@@ -47,15 +47,22 @@
 </template>
 
 <script>
-
 import Emoji from './Emoji'
 import Skins from './skins'
+import { defineComponent, computed } from 'vue'
 
-export default {
+export default defineComponent({
+  name: 'EmojiPreview',
+
+  components: {
+    Emoji,
+    Skins
+  },
+
   props: {
     data: {
       type: Object,
-      required: true
+      required: true,
     },
     title: {
       type: String,
@@ -85,25 +92,15 @@ export default {
       required: true
     }
   },
-  computed: {
-    emojiData() {
-      if (this.emoji) {
-        return this.emoji
-      } else {
-        return {}
-      }
-    },
-    emojiShortNames() {
-      return this.emojiData.short_names
-    },
-    emojiEmoticons() {
-      return this.emojiData.emoticons
-    }
-  },
-  components: {
-    Emoji,
-    Skins
-  }
-}
 
+  setup(props) {
+    const emojiData = computed(() => props.emoji ? props.emoji : {})
+
+    return {
+      emojiData,
+      emojiShortNames: computed(() => emojiData.value.short_names),
+      emojiEmoticons: computed(() => emojiData.emoticons)
+    }
+  }
+})
 </script>

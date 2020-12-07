@@ -5,8 +5,9 @@
 </template>
 
 <script>
+import { defineComponent, onMounted, computed, watch, ref, getCurrentInstance } from 'vue'
 
-export default {
+export default defineComponent({
   props: {
     data: {
       type: Object,
@@ -25,33 +26,30 @@ export default {
       required: true
     }
   },
-  data() {
-    return {
-      value: ''
-    }
-  },
-  computed: {
-    emojiIndex() {
-      return this.data
-    }
-  },
-  watch: {
-    value() {
-      this.$emit('search', this.value)
-    }
-  },
-  methods: {
-    clear() {
-      this.value = ''
-    }
-  },
-  mounted() {
-    let $input = this.$el.querySelector('input')
 
-    if (this.autoFocus) {
-      $input.focus()
+  setup(props, { emit }) {
+    const value = ref('')
+
+    watch(
+      value,
+      () => emit('search', value.value)
+    )
+
+    onMounted(() => {
+      if (!props.autoFocus) return
+
+      let $el = getCurrentInstance() && getCurrentInstance().proxy.$el || null
+      if (!$el) return
+
+      $el.querySelector('input').focus()
+    })
+
+    return {
+      value,
+      clear:() => (value.value = ''),
+      emojiIndex: computed(() => props.data)
     }
   }
-}
+})
 
 </script>

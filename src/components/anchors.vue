@@ -4,10 +4,10 @@
   <span
     v-for="category in categories"
     :key="category.id"
-    :class="{ 'emoji-mart-anchor': true, 'emoji-mart-anchor-selected': category.id == activeCategory.id }"
-    :style="{ 'color': (category.id == activeCategory.id ? color : '') }"
+    :class="{ 'emoji-mart-anchor': true, 'emoji-mart-anchor-selected': category.id === activeCategory.id }"
+    :style="{ 'color': (category.id === activeCategory.id ? color : '') }"
     :data-title="i18n.categories[category.id]"
-    @click="$emit('click', category)">
+    @click="$emit('active', category)">
     <div v-html="svgs[category.id]"/>
     <span class="emoji-mart-anchor-bar" :style="{ backgroundColor: color }"></span>
   </span>
@@ -18,8 +18,11 @@
 <script>
 
 import svgs from '../svgs'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
+  name: 'Anchors',
+
   props: {
     i18n: {
       type: Object,
@@ -39,9 +42,12 @@ export default {
       }
     }
   },
-  created() {
-    this.svgs = svgs
+
+  setup() {
+    return {
+      svgs,
+    }
   }
-}
+})
 
 </script>

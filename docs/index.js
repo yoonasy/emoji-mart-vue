@@ -1,13 +1,12 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './app'
 
 // See https://github.com/quasarframework/quasar/issues/1576
 // for the information about Quasar integration into existing app.
-import 'quasar-framework/dist/umd/quasar.mat.css'
-import Quasar from 'quasar-framework/dist/quasar.mat.esm'
-Vue.use(Quasar)
+// import 'quasar-framework/dist/umd/quasar.mat.css'
+// import Quasar from 'quasar-framework/dist/quasar.mat.esm'
 
-new Vue({
-	el: '#app',
-	render: (h) => h(App),
-})
+// Vue.use(Quasar)
+
+const app = createApp(App)
+app.mount('#app')

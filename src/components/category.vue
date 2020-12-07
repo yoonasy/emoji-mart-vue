@@ -18,7 +18,7 @@
     </span>
   </template>
 
-  <div v-if="!hasResults">
+  <div v-if="!hasResults && data">
     <emoji
       :data="data"
       emoji="sleuth_or_spy"
@@ -33,16 +33,17 @@
 </template>
 
 <script>
-
 import { EmojiView } from '../utils/emoji-data'
 import Emoji from './Emoji'
+import { defineComponent, computed } from 'vue'
 
+export default defineComponent({
+  name: 'EmojiCategory',
 
-export default {
   props: {
     data: {
       type: Object,
-      required: true
+      default: () => ({})
     },
     i18n: {
       type: Object,
@@ -64,35 +65,44 @@ export default {
       required: true
     }
   },
-  computed: {
-    isVisible() {
-      return !!this.emojis
-    },
-    isSearch() {
-      return this.name == 'Search'
-    },
-    hasResults() {
-      return this.emojis.length > 0
-    },
-    emojiObjects() {
-      return this.emojis.map((emoji) => {
-          let emojiObject = emoji
-          let emojiView = new EmojiView(
-            emoji,
-            this.emojiProps.skin,
-            this.emojiProps.set,
-            this.emojiProps.native,
-            this.emojiProps.fallback,
-            this.emojiProps.emojiTooltip,
-            this.emojiProps.emojiSize,
-          )
-          return { emojiObject, emojiView }
-      })
-    }
-  },
+
   components: {
     Emoji
+  },
+
+  setup(props) {
+    const isVisible = computed(() => {
+      return !!props.emojis
+    })
+    const isSearch = computed(() => {
+      return props.name === 'Search'
+    })
+    const hasResults = computed(() => {
+      return props.emojis.length > 0
+    })
+    const emojiObjects = computed(() => {
+      return props.emojis.map((emoji) => {
+        let emojiObject = emoji
+        let emojiView = new EmojiView(
+          emoji,
+          props.emojiProps.skin,
+          props.emojiProps.set,
+          props.emojiProps.native,
+          props.emojiProps.fallback,
+          props.emojiProps.emojiTooltip,
+          props.emojiProps.emojiSize,
+        )
+        return { emojiObject, emojiView }
+      })
+    })
+
+    return {
+      isVisible,
+      isSearch,
+      hasResults,
+      emojiObjects,
+    }
   }
-}
+})
 
 </script>

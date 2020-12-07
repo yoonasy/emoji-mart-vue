@@ -6,3 +6,4 @@ report.html
 *.tags
 Session.vim
 coverage/
+yarn-error.log

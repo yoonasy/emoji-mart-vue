@@ -2,6 +2,7 @@
 // The main change is in import - 'StaticPicker as Picker'
 // Other changes are marked with `// StaticPicker change` comments.
 import { mount } from '@vue/test-utils'
+import './polyfill/IntersectionObserver'
 
 import data from '../data/all.json'
 import { EmojiIndex } from '../src/utils/emoji-data'

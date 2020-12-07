@@ -1,7 +1,7 @@
 var path = require('path')
 var pack = require('../package.json')
 var webpack = require('webpack')
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 
 var PROD = process.env.NODE_ENV === 'production'
 var TEST = process.env.NODE_ENV === 'test'
@@ -102,7 +102,7 @@ module.exports = Object.assign(
     ? {
         mode: 'development',
         devtool: 'inline-source-map',
-        watch: true,
+        watch: false, // is watch to be files change to recompile
         devServer: {
           inline: true,
         },

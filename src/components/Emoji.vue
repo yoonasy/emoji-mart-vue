@@ -17,8 +17,11 @@
 <script>
 import { EmojiProps } from '../utils/shared-props'
 import { EmojiView } from '../utils/emoji-data'
+import { defineComponent, computed, ref } from 'vue'
 
-export default {
+export default defineComponent({
+  name: 'Emoji',
+
   props: {
     ...EmojiProps,
     data: {
@@ -26,43 +29,41 @@ export default {
       required: true,
     },
   },
-  computed: {
-    view() {
-      return new EmojiView(
-        this.emojiObject,
-        this.skin,
-        this.set,
-        this.native,
-        this.fallback,
-        this.tooltip,
-        this.size,
-      )
-    },
-    sanitizedData() {
-      return this.emojiObject._sanitized
-    },
-    title() {
-      return this.tooltip ? this.emojiObject.short_name : null
-    },
-    emojiObject() {
-      if (typeof this.emoji == 'string') {
-        return this.data.findEmoji(this.emoji)
-      } else {
-        return this.emoji
-      }
-    },
-  },
-  created() {},
-  methods: {
-    onClick() {
-      this.$emit('click', this.emojiObject)
-    },
-    onMouseEnter() {
-      this.$emit('mouseenter', this.emojiObject)
-    },
-    onMouseLeave() {
-      this.$emit('mouseleave', this.emojiObject)
-    },
-  },
-}
+
+  emits: ['mouseenter', 'mouseleave', 'click'],
+
+  setup(props, { emit }) {
+    const emojiObject = computed(() => typeof props.emoji == 'string'
+      ? props.data.findEmoji(props.emoji)
+      : props.emoji)
+
+    const view = computed(() => new EmojiView(
+      emojiObject.value,
+      props.skin,
+      props.set,
+      props.native,
+      props.fallback,
+      props.tooltip,
+      props.size,
+    ))
+
+    const sanitizedData = computed(() => {
+      return emojiObject.value._sanitized
+    })
+
+    const title = computed(() => {
+      return props.tooltip ? emojiObject.value.short_name : null
+    })
+
+    return {
+      view,
+      title,
+      onClick: () => emit('click', emojiObject.value),
+      onMouseEnter:() => emit('mouseenter', emojiObject.value),
+      onMouseLeave:() => emit('mouseleave', emojiObject.value),
+      emojiObject, // use jest unit
+      sanitizedData, // use jest unit
+    }
+  }
+})
 </script>

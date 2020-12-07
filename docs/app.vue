@@ -17,11 +17,11 @@
     <div class="row">
       <template
         v-for="set in ['native', 'apple', 'google', 'twitter', 'facebook']"
+        :key="set"
       >
         <button
-          :key="set"
           @click="activeSet = set"
-          :disabled="activeSet == set"
+          :disabled="activeSet === set"
         >
           {{ set }}
         </button>
@@ -56,14 +56,14 @@
     <div class="row"></div>
     <h2>QDialog Example</h2>
     <div class="row">
-      <q-btn label="Open QDialog" @click="emojiPickerDialog = true" />
+<!--      <q-btn label="Open QDialog" @click="emojiPickerDialog = true" />-->
     </div>
 
-    <q-dialog v-model="emojiPickerDialog">
-      <template v-slot:body style="height:450px">
-        <picker :data="index" :emojiSize="24" :native="true"></picker>
-      </template>
-    </q-dialog>
+<!--    <q-dialog v-model="emojiPickerDialog">-->
+<!--      <template v-slot:body style="height:450px">-->
+<!--        <picker :data="index" :emojiSize="24" :native="true"></picker>-->
+<!--      </template>-->
+<!--    </q-dialog>-->
 
     <div class="row"></div>
     <h2>Custom Dialog Example</h2>
@@ -164,9 +164,10 @@
 <script>
 import data from '../data/all.json'
 import { Picker, StaticPicker, Emoji, EmojiIndex } from '../src'
-import '../css/emoji-mart.css'
+import '../dist/emoji-mart.css'
+import { defineComponent, computed, ref } from 'vue'
 
-import { QBtn, QDialog } from 'quasar-framework/dist/quasar.mat.esm'
+// import { QBtn, QDialog } from 'quasar-framework/dist/quasar.mat.esm'
 
 const CUSTOM_EMOJIS = [
   {
@@ -233,15 +234,47 @@ const indexInclude = new EmojiIndex(data, {
   include: ['nature', 'smileys', 'recent'],
 })
 
-export default {
-  data() {
+export default defineComponent({
+  name: 'app',
+
+  setup() {
+    const activeSet = ref('native')
+
+    const native = computed(() => {
+      return activeSet.value === 'native'
+    })
+    const smile = computed(() => {
+      // Static emoji example
+      let emoji = index.findEmoji(':smile:')
+      // Note, that position in the emoji sheet is calculated by
+      // `emoji` object
+      let style = `background-position: ${emoji.getPosition()}; background-image: url(https://unpkg.com/emoji-datasource-twitter@5.0.1/img/twitter/sheets-256/64.png); width: 24px; height: 24px; display: inline-block; background-size: 5700%`
+      return `<div class='emoji' style="${style}"></div>`
+    })
+    const santaEmojiObject = computed(() => {
+      return index.findEmoji(':santa:')
+    })
+
+    const toggleVisible = () => {
+      this.isVisible = !this.isVisible
+    }
+    const toggleFlagsVisible = () => {
+      this.flagsVisible = !this.flagsVisible
+      if (!this.flagsVisible) {
+        this.$refs.flags.onAnchorClick(this.$refs.flags.categories[0])
+      }
+    }
+    const showEmoji = (emoji) => {
+      this.emojisOutput = this.emojisOutput + emoji.native
+    }
+
     return {
       index: index,
       indexFiltered: indexFiltered,
       indexInclude: indexInclude,
       indexI18n: indexI18n,
       i18n: i18n,
-      activeSet: 'native',
+      activeSet,
       emoji: 'point_up',
       title: 'Pick your emoji…',
       isVisible: true,
@@ -249,46 +282,21 @@ export default {
       emojiPickerCustomDialog: false,
       emojisOutput: '',
       flagsVisible: true,
+      native,
+      smile,
+      santaEmojiObject,
+      toggleVisible,
+      toggleFlagsVisible,
+      showEmoji,
     }
   },
-  computed: {
-    native() {
-      return this.activeSet == 'native'
-    },
-    smile() {
-      // Static emoji example
-      let emoji = index.findEmoji(':smile:')
-      // Note, that position in the emoji sheet is calculated by
-      // `emoji` object
-      let style = `background-position: ${emoji.getPosition()}; background-image: url(https://unpkg.com/emoji-datasource-twitter@5.0.1/img/twitter/sheets-256/64.png); width: 24px; height: 24px; display: inline-block; background-size: 5700%`
-      return `<div class='emoji' style="${style}"></div>`
-    },
-    santaEmojiObject() {
-      return index.findEmoji(':santa:')
-    },
-  },
-  methods: {
-    toggleVisible() {
-      this.isVisible = !this.isVisible
-    },
-    toggleFlagsVisible() {
-      this.flagsVisible = !this.flagsVisible
-      if (!this.flagsVisible) {
-        this.$refs.flags.onAnchorClick(this.$refs.flags.categories[0])
-      }
-    },
-    showEmoji(emoji) {
-      this.emojisOutput = this.emojisOutput + emoji.native
-    },
-  },
+
   components: {
     Picker,
     StaticPicker,
     Emoji,
-    QBtn,
-    QDialog,
   },
-}
+})
 </script>
 
 <style scoped>
@@ -318,7 +326,7 @@ button[disabled] {
  * the `>>>` allows to apply scoped css to child element that is generated
  * dynamically
 **/
-.modal >>> .modal-scroll {
+.modal ::v-deep(.modal-scroll) {
   color: red;
   max-height: none;
 }

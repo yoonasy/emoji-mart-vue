@@ -2,12 +2,11 @@
   <div class="emoji-mart" :style="customStyles">
     <div class="emoji-mart-bar emoji-mart-bar-anchors" v-if="showCategories">
       <anchors
-        :data="data"
         :i18n="mergedI18n"
         :color="color"
         :categories="categories"
         :active-category="activeCategory"
-        @click="onAnchorClick"
+        @active="onAnchorClick"
       />
     </div>
 
@@ -41,7 +40,7 @@
     />
     <DynamicScroller
       v-show="!searchEmojis"
-      ref="dynScroller"
+      ref="dynScrollerRef"
       :items="scrollerCategories"
       :min-item-size="60"
       class="scroller"
@@ -50,13 +49,11 @@
       :emit-update="true"
       @update="onScrollUpdate"
     >
-      <template slot-scope="{ item, active, index }">
+      <template v-slot="{ item, active, index }">
         <DynamicScrollerItem :item="item" :active="active" :data-index="index">
-          <category
-            v-show="item.show"
+          <Category
+            v-show="true"
             ref="categories"
-            :key="item.category.id"
-            :data="item.data"
             :i18n="item.mergedI18n"
             :id="item.category.id"
             :name="item.category.name"
@@ -122,8 +119,10 @@ import Search from './search'
  * scrollToItem() calls work correctly.
  */
 
-import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
-// import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import { DynamicScroller, DynamicScrollerItem } from 'vue3-virtual-scroller'
+import 'vue3-virtual-scroller/dist/vue3-virtual-scroller.css'
+
+import { defineComponent, computed, ref } from 'vue'
 
 const I18N = {
   search: 'Search',
@@ -144,7 +143,9 @@ const I18N = {
   },
 }
 
-export default {
+export default defineComponent({
+  name: 'EmojiPicker',
+
   props: {
     ...PickerProps,
     data: {
@@ -152,125 +153,7 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      activeSkin: this.skin || store.get('skin') || this.defaultSkin,
-      activeCategory: null,
-      previewEmoji: null,
-      searchEmojis: null,
-    }
-  },
-  computed: {
-    customStyles() {
-      return {
-        width: this.calculateWidth + 'px',
-        ...this.pickerStyles,
-      }
-    },
-    emojiProps() {
-      return {
-        native: this.native,
-        skin: this.activeSkin,
-        set: this.set,
-        emojiTooltip: this.emojiTooltip,
-        emojiSize: this.emojiSize,
-        onEnter: this.onEmojiEnter.bind(this),
-        onLeave: this.onEmojiLeave.bind(this),
-        onClick: this.onEmojiClick.bind(this),
-      }
-    },
-    skinProps() {
-      return {
-        skin: this.activeSkin,
-      }
-    },
-    calculateWidth() {
-      return this.perLine * (this.emojiSize + 12) + 12 + 2 + measureScrollbar()
-    },
-    scrollerCategories() {
-      let id = 0
-      return this.categories.map((category) => {
-        return {
-          id: id++,
-          category: category,
-          show:
-            !this.searchEmojis &&
-            (this.infiniteScroll || category == this.activeCategory),
-          mergedI18n: this.mergedI18n,
-          data: this.data,
-          emojisLength: category.emojis.length,
-          emojiProps: this.emojiProps,
-        }
-      })
-    },
-    mergedI18n() {
-      return Object.freeze(deepMerge(I18N, this.i18n))
-    },
-    idleEmoji() {
-      try {
-        return this.data.emoji(this.emoji)
-      } catch (e) {
-        console.error(
-          'Default preview emoji `' +
-            this.emoji +
-            '` is not available, check the Picker `emoji` property',
-        )
-        console.error(e)
-        return this.data.firstEmoji()
-      }
-    },
-  },
-  created() {
-    this.categories = []
-    this.categories.push(...this.data.categories())
-    this.categories = this.categories.filter((category) => {
-      return category.emojis.length > 0
-    })
 
-    this.categories[0].first = true
-    Object.freeze(this.categories)
-    this.activeCategory = this.categories[0]
-    this.skipScrollUpdate = false
-  },
-  methods: {
-    onScrollUpdate(startIndex, endIndex) {
-      if (this.skipScrollUpdate) {
-        this.skipScrollUpdate = false
-      } else {
-        // The `endIndex-2` seems to work, but this depends on the internals
-        // of the virtual scroller, I didn't observe it to be less than 0,
-        // but just for the case, we aslo have a fallback to `0` here.
-        let activeIndex = endIndex - 2 > 0 ? endIndex - 2 : 0
-        this.activeCategory = this.categories[activeIndex]
-      }
-    },
-    onAnchorClick(category) {
-      let i = this.categories.indexOf(category)
-      this.$refs.dynScroller.scrollToItem(i)
-      this.activeCategory = this.categories[i]
-      this.skipScrollUpdate = true
-    },
-    onSearch(value) {
-      let emojis = this.data.search(value, this.maxSearchResults)
-      this.searchEmojis = emojis
-    },
-    onEmojiEnter(emoji) {
-      this.previewEmoji = emoji
-    },
-    onEmojiLeave(emoji) {
-      this.previewEmoji = null
-    },
-    onEmojiClick(emoji) {
-      this.$emit('select', emoji)
-      frequently.add(emoji)
-    },
-    onSkinChange(skin) {
-      this.activeSkin = skin
-      store.update({ skin })
-
-      this.$emit('skin-change', skin)
-    },
-  },
   components: {
     Anchors,
     Category,
@@ -279,5 +162,149 @@ export default {
     DynamicScroller,
     DynamicScrollerItem,
   },
-}
+
+  emits: ['select', 'skin-change'],
+
+  setup(props, { emit }) {
+    let skipScrollUpdate = false
+    let categories = [...props.data.categories()]
+
+    const previewEmoji = ref(null)
+    const searchEmojis = ref(null)
+    const dynScrollerRef = ref(null)
+
+    categories = categories.filter(category => category.emojis.length > 0)
+    categories[0].first = true
+    Object.freeze(categories)
+
+    const activeCategory = ref(categories[0])
+
+    const calculateWidth = computed(() => {
+      return props.perLine * (props.emojiSize + 12) + 12 + 2 + measureScrollbar()
+    })
+
+    const activeSkin = computed(() => props.skin || store.get('skin') || props.defaultSkin)
+
+    const customStyles = computed(() => {
+      return {
+        width: calculateWidth.value + 'px',
+        ...props.pickerStyles,
+      }
+    })
+
+    const emojiProps = computed(() => {
+      return {
+        native: props.native,
+        skin: activeSkin.value,
+        set: props.set,
+        emojiTooltip: props.emojiTooltip,
+        emojiSize: props.emojiSize,
+        onEnter: onEmojiEnter,
+        onLeave: onEmojiLeave,
+        onClick: onEmojiClick,
+      }
+    })
+
+    const skinProps = computed(() => {
+      return {
+        skin: activeSkin.value,
+      }
+    })
+
+    const mergedI18n = computed(() => {
+      return Object.freeze(deepMerge(I18N, props.i18n))
+    })
+
+    const scrollerCategories = computed(() => {
+      let id = 0
+      return categories.map((category) => {
+        return {
+          id: id++,
+          category: category,
+          show:
+            !searchEmojis.value &&
+            (props.infiniteScroll || category.id === activeCategory.value.id),
+          mergedI18n: mergedI18n.value,
+          data: props.data,
+          emojisLength: category.emojis.length,
+          emojiProps: emojiProps.value,
+        }
+      })
+    })
+
+    const idleEmoji = computed(() => {
+      try {
+        return props.data.emoji(props.emoji)
+      } catch (e) {
+        console.error(
+          'Default preview emoji `' +
+          props.emoji +
+          '` is not available, check the Picker `emoji` property',
+          e,
+        )
+        return props.data.firstEmoji()
+      }
+    })
+
+    // =============================
+    const onScrollUpdate = (startIndex, endIndex) => {
+      if (skipScrollUpdate) {
+        skipScrollUpdate = false
+      } else {
+        // The `endIndex-2` seems to work, but this depends on the internals
+        // of the virtual scroller, I didn't observe it to be less than 0,
+        // but just for the case, we aslo have a fallback to `0` here.
+        let activeIndex = endIndex - 2 > 0 ? endIndex - 2 : 0
+        activeCategory.value = categories[activeIndex]
+      }
+    }
+    const onAnchorClick = (category) => {
+      let i = categories.indexOf(category)
+      if (dynScrollerRef.value) {
+        dynScrollerRef.value.scrollToItem(i)
+      }
+
+      activeCategory.value = categories[i]
+      skipScrollUpdate = true
+    }
+    const onSearch = (value) => {
+      searchEmojis.value = props.data.search(value, props.maxSearchResults)
+    }
+    const onEmojiEnter = (emoji) => {
+      previewEmoji.value = emoji
+    }
+    const onEmojiLeave = () => {
+      previewEmoji.value = null
+    }
+    const onEmojiClick = (emoji) => {
+      emit('select', emoji)
+      frequently.add(emoji)
+    }
+    const onSkinChange = (skin) => {
+      activeSkin.value = skin
+      store.update({ skin })
+
+      emit('skin-change', skin)
+    }
+
+    return {
+      dynScrollerRef,
+      activeCategory,
+      previewEmoji,
+      searchEmojis,
+      categories,
+
+      customStyles,
+      mergedI18n,
+      onAnchorClick,
+      onSearch,
+      emojiProps,
+      scrollerCategories,
+      onScrollUpdate,
+      idleEmoji,
+      skinProps,
+      onSkinChange,
+    }
+  }
+})
 </script>

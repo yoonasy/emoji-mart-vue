@@ -11,7 +11,6 @@ describe('#EmojiIndex', () => {
         new EmojiData({
           short_names: ['pineapple'],
           name: 'Pineapple',
-          unified: '1f34d',
           added_in: '2.0',
           emoticons: undefined,
           has_img_apple: true,

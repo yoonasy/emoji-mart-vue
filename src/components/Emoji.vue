@@ -8,16 +8,14 @@
     @mouseleave="onMouseLeave"
     @click="onClick"
   >
-    <span :class="view.cssClass" :style="view.cssStyle">{{
-      view.content
-    }}</span>
+    <span :class="view.cssClass" :style="view.cssStyle">{{ view.content }}</span>
   </span>
 </template>
 
 <script>
 import { EmojiProps } from '../utils/shared-props'
 import { EmojiView } from '../utils/emoji-data'
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, computed } from 'vue'
 
 export default defineComponent({
   name: 'Emoji',
@@ -33,19 +31,22 @@ export default defineComponent({
   emits: ['mouseenter', 'mouseleave', 'click'],
 
   setup(props, { emit }) {
-    const emojiObject = computed(() => typeof props.emoji == 'string'
-      ? props.data.findEmoji(props.emoji)
-      : props.emoji)
+    const emojiObject = computed(() =>
+      typeof props.emoji == 'string' ? props.data.findEmoji(props.emoji) : props.emoji
+    )
 
-    const view = computed(() => new EmojiView(
-      emojiObject.value,
-      props.skin,
-      props.set,
-      props.native,
-      props.fallback,
-      props.tooltip,
-      props.size,
-    ))
+    const view = computed(
+      () =>
+        new EmojiView(
+          emojiObject.value,
+          props.skin,
+          props.set,
+          props.native,
+          props.fallback,
+          props.tooltip,
+          props.size
+        )
+    )
 
     const sanitizedData = computed(() => {
       return emojiObject.value._sanitized
@@ -59,11 +60,11 @@ export default defineComponent({
       view,
       title,
       onClick: () => emit('click', emojiObject.value),
-      onMouseEnter:() => emit('mouseenter', emojiObject.value),
-      onMouseLeave:() => emit('mouseleave', emojiObject.value),
+      onMouseEnter: () => emit('mouseenter', emojiObject.value),
+      onMouseLeave: () => emit('mouseleave', emojiObject.value),
       emojiObject, // use jest unit
       sanitizedData, // use jest unit
     }
-  }
+  },
 })
 </script>

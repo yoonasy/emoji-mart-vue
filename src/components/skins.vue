@@ -1,11 +1,19 @@
 <template>
-
-<div :class="{ 'emoji-mart-skin-swatches': true, 'emoji-mart-skin-swatches-opened': opened }">
-  <span v-for="skinTone in 6" :key="skinTone" :class="{ 'emoji-mart-skin-swatch': true, 'emoji-mart-skin-swatch-selected': skin === skinTone }">
-    <span :class="'emoji-mart-skin emoji-mart-skin-tone-' + skinTone" @click="onClick(skinTone)"></span>
-  </span>
-</div>
-
+  <div :class="{ 'emoji-mart-skin-swatches': true, 'emoji-mart-skin-swatches-opened': opened }">
+    <span
+      v-for="skinTone in 6"
+      :key="skinTone"
+      :class="{
+        'emoji-mart-skin-swatch': true,
+        'emoji-mart-skin-swatch-selected': skin === skinTone,
+      }"
+    >
+      <span
+        :class="'emoji-mart-skin emoji-mart-skin-tone-' + skinTone"
+        @click="onClick(skinTone)"
+      ></span>
+    </span>
+  </div>
 </template>
 
 <script>
@@ -17,9 +25,11 @@ export default defineComponent({
   props: {
     skin: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
+
+  emits: ['change'],
 
   setup(props, { emit }) {
     const opened = ref(false)
@@ -36,9 +46,8 @@ export default defineComponent({
 
     return {
       opened,
-      onClick
+      onClick,
     }
-  }
+  },
 })
-
 </script>

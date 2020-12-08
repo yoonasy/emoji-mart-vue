@@ -1,23 +1,24 @@
 <template>
-
-<div class="emoji-mart-anchors">
-  <span
-    v-for="category in categories"
-    :key="category.id"
-    :class="{ 'emoji-mart-anchor': true, 'emoji-mart-anchor-selected': category.id === activeCategory.id }"
-    :style="{ 'color': (category.id === activeCategory.id ? color : '') }"
-    :data-title="i18n.categories[category.id]"
-    @click="$emit('change', category)">
-    <div v-html="svgs[category.id]"/>
-    <span class="emoji-mart-anchor-bar" :style="{ backgroundColor: color }"></span>
-  </span>
-</div>
-
+  <div class="emoji-mart-anchors">
+    <span
+      v-for="category in categories"
+      :key="category.id"
+      :class="{
+        'emoji-mart-anchor': true,
+        'emoji-mart-anchor-selected': category.id === activeCategory.id,
+      }"
+      :style="{ color: category.id === activeCategory.id ? color : '' }"
+      :data-title="i18n.categories[category.id]"
+      @click="$emit('change', category)"
+    >
+      <div v-html="SVG[category.id]" />
+      <span class="emoji-mart-anchor-bar" :style="{ backgroundColor: color }"></span>
+    </span>
+  </div>
 </template>
 
 <script>
-
-import svgs from '../svgs'
+import SVG from '../svgs/index.js'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -26,28 +27,27 @@ export default defineComponent({
   props: {
     i18n: {
       type: Object,
-      required: true
+      required: true,
     },
     color: {
-      type: String
+      type: String,
     },
     categories: {
       type: Array,
-      required: true
+      required: true,
     },
     activeCategory: {
       type: Object,
       default() {
         return {}
-      }
-    }
+      },
+    },
   },
 
   setup() {
     return {
-      svgs,
+      SVG,
     }
-  }
+  },
 })
-
 </script>

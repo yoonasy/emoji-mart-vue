@@ -1,7 +1,6 @@
 <template>
-
-<div class="emoji-mart-preview">
-  <template v-if="emoji">
+  <div class="emoji-mart-preview">
+    <template v-if="emoji">
       <div class="emoji-mart-preview-emoji">
         <emoji
           :data="data"
@@ -15,40 +14,49 @@
       <div class="emoji-mart-preview-data">
         <div class="emoji-mart-preview-name">{{ emoji.name }}</div>
         <div class="emoji-mart-preview-shortnames">
-          <span v-for="shortName in emojiShortNames" :key="shortName" class="emoji-mart-preview-shortname">:{{ shortName }}:</span>
+          <span
+            v-for="shortName in emojiShortNames"
+            :key="shortName"
+            class="emoji-mart-preview-shortname"
+            >:{{ shortName }}:</span
+          >
         </div>
         <div class="emoji-mart-preview-emoticons">
-          <span v-for="emoticon in emojiEmoticons" :key="emoticon" class="emoji-mart-preview-emoticon">{{ emoticon }}</span>
+          <span
+            v-for="emoticon in emojiEmoticons"
+            :key="emoticon"
+            class="emoji-mart-preview-emoticon"
+            >{{ emoticon }}</span
+          >
         </div>
       </div>
-  </template>
+    </template>
 
-  <template v-else>
-    <div class="emoji-mart-preview-emoji">
-      <emoji
-        :data="data"
-        :emoji="idleEmoji"
-        :native="emojiProps.native"
-        :skin="emojiProps.skin"
-        :set="emojiProps.set"
-      />
-    </div>
+    <template v-else>
+      <div class="emoji-mart-preview-emoji">
+        <emoji
+          :data="data"
+          :emoji="idleEmoji"
+          :native="emojiProps.native"
+          :skin="emojiProps.skin"
+          :set="emojiProps.set"
+        />
+      </div>
 
-    <div class="emoji-mart-preview-data">
-      <span class="emoji-mart-title-label">{{ title }}</span>
-    </div>
+      <div class="emoji-mart-preview-data">
+        <span class="emoji-mart-title-label">{{ title }}</span>
+      </div>
 
-    <div v-if="showSkinTones" class="emoji-mart-preview-skins">
-      <skins :skin="skinProps.skin" @change="onSkinChange($event)" />
-    </div>
-  </template>
-</div>
-
+      <div v-if="showSkinTones" class="emoji-mart-preview-skins">
+        <skins :skin="skinProps.skin" @change="onSkinChange($event)" />
+      </div>
+    </template>
+  </div>
 </template>
 
 <script>
-import Emoji from './Emoji'
-import Skins from './skins'
+import Emoji from './Emoji.vue'
+import Skins from './skins.vue'
 import { defineComponent, computed } from 'vue'
 
 export default defineComponent({
@@ -56,7 +64,7 @@ export default defineComponent({
 
   components: {
     Emoji,
-    Skins
+    Skins,
   },
 
   props: {
@@ -66,41 +74,41 @@ export default defineComponent({
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
     emoji: {
-      type: [String, Object]
+      type: [String, Object],
     },
     idleEmoji: {
       type: [String, Object],
-      required: true
+      required: true,
     },
     showSkinTones: {
       type: Boolean,
-      default: true
+      default: true,
     },
     emojiProps: {
       type: Object,
-      required: true
+      required: true,
     },
     skinProps: {
       type: Object,
-      required: true
+      required: true,
     },
     onSkinChange: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   },
 
   setup(props) {
-    const emojiData = computed(() => props.emoji ? props.emoji : {})
+    const emojiData = computed(() => (props.emoji ? props.emoji : {}))
 
     return {
       emojiData,
       emojiShortNames: computed(() => emojiData.value.short_names),
-      emojiEmoticons: computed(() => emojiData.emoticons)
+      emojiEmoticons: computed(() => emojiData.value.emoticons),
     }
-  }
+  },
 })
 </script>

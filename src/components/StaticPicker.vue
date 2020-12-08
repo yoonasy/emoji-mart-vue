@@ -1,6 +1,6 @@
 <template>
   <div class="emoji-mart emoji-mart-static" :style="customStyles">
-    <div class="emoji-mart-bar emoji-mart-bar-anchors" v-if="showCategories">
+    <div v-if="showCategories" class="emoji-mart-bar emoji-mart-bar-anchors">
       <anchors
         :data="data"
         :i18n="mergedI18n"
@@ -29,12 +29,12 @@
       />
     </slot>
 
-    <div class="emoji-mart-scroll" ref="scrollRef" @scroll="onScroll">
+    <div ref="scrollRef" class="emoji-mart-scroll" @scroll="onScroll">
       <category
         v-show="searchEmojis"
+        id="search"
         :data="data"
         :i18n="mergedI18n"
-        id="search"
         name="Search"
         :emojis="searchEmojis"
         :emoji-props="emojiProps"
@@ -42,11 +42,11 @@
       <category
         v-for="category in filteredCategories"
         v-show="!searchEmojis && (infiniteScroll || category === activeCategory)"
+        :id="category.id"
         ref="categories"
         :key="category.id"
         :data="data"
         :i18n="mergedI18n"
-        :id="category.id"
         :name="category.name"
         :emojis="category.emojis"
         :emoji-props="emojiProps"
@@ -64,7 +64,7 @@
       :skin-props="skinProps"
       :on-skin-change="onSkinChange"
     >
-      <div class="emoji-mart-bar emoji-mart-bar-preview" v-if="showPreview">
+      <div v-if="showPreview" class="emoji-mart-bar emoji-mart-bar-preview">
         <preview
           :data="data"
           :title="title"
@@ -108,8 +108,6 @@ import { defineComponent, ref, computed } from 'vue'
  * size calculation for all categories and the following
  * scrollToItem() calls work correctly.
  */
-
-import { DynamicScroller, DynamicScrollerItem } from 'vue3-virtual-scroller'
 import 'vue3-virtual-scroller/dist/vue3-virtual-scroller.css'
 
 const I18N = {
@@ -139,22 +137,20 @@ export default defineComponent({
     Category,
     Preview,
     Search,
-    DynamicScroller,
-    DynamicScrollerItem,
   },
 
   props: {
     ...PickerProps,
     include: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     emojisToShowFilter: {
-      type: Function
+      type: Function,
     },
     exclude: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     data: {
       type: Object,
@@ -179,7 +175,9 @@ export default defineComponent({
     const previewEmoji = ref(null)
     const searchEmojis = ref(null)
 
-    const calculateWidth = computed(() => props.perLine * (props.emojiSize + 12) + 12 + 2 + measureScrollbar())
+    const calculateWidth = computed(
+      () => props.perLine * (props.emojiSize + 12) + 12 + 2 + measureScrollbar()
+    )
 
     const emojiProps = computed(() => ({
       native: props.native,
@@ -202,13 +200,9 @@ export default defineComponent({
     const filteredCategories = computed(() => {
       return categories.filter((category) => {
         let isIncluded =
-          props.include && props.include.length
-            ? props.include.indexOf(category.id) > -1
-            : true
+          props.include && props.include.length ? props.include.indexOf(category.id) > -1 : true
         let isExcluded =
-          props.exclude && props.exclude.length
-            ? props.exclude.indexOf(category.id) > -1
-            : false
+          props.exclude && props.exclude.length ? props.exclude.indexOf(category.id) > -1 : false
         let hasEmojis = category.emojis.length > 0
         if (props.emojisToShowFilter) {
           hasEmojis = category.emojis.some((emoji) => {
@@ -225,8 +219,8 @@ export default defineComponent({
       } catch (e) {
         console.error(
           'Default preview emoji `' +
-          props.emoji +
-          '` is not available, check the Picker `emoji` property',
+            props.emoji +
+            '` is not available, check the Picker `emoji` property'
         )
         console.error(e)
         return props.data.firstEmoji()
@@ -244,7 +238,7 @@ export default defineComponent({
 
     const onScrollPaint = () => {
       waitingForPaint = false
-      let scrollTop = scrollRef.scrollTop,
+      let scrollTop = scrollRef.value.scrollTop,
         _activeCategory = filteredCategories.value[0]
       for (let i = 0, l = filteredCategories.value.length; i < l; i++) {
         let category = filteredCategories.value[i],
@@ -323,6 +317,6 @@ export default defineComponent({
       emojiProps,
       onSkinChange,
     }
-  }
+  },
 })
 </script>

@@ -1,73 +1,76 @@
 <template>
+  <div
+    v-if="isVisible && (isSearch || hasResults)"
+    :class="{ 'emoji-mart-category': true, 'emoji-mart-no-results': !hasResults }"
+  >
+    <div class="emoji-mart-category-label">
+      <span>{{ i18n.categories[id] }}</span>
+    </div>
 
-<div :class="{ 'emoji-mart-category': true, 'emoji-mart-no-results': !hasResults }" v-if="isVisible && (isSearch || hasResults)">
-  <div class="emoji-mart-category-label">
-    <span>{{ i18n.categories[id] }}</span>
+    <template v-for="{ emojiObject, emojiView } in emojiObjects">
+      <span
+        v-if="emojiView.canRender"
+        :key="emojiView.id"
+        :data-title="emojiObject.short_name"
+        :title="emojiView.title"
+        class="emoji-mart-emoji"
+        @mouseenter="emojiProps.onEnter(emojiView.getEmoji())"
+        @mouseleave="emojiProps.onLeave(emojiView.getEmoji())"
+        @click="emojiProps.onClick(emojiView.getEmoji())"
+      >
+        <span :class="emojiView.cssClass" :style="emojiView.cssStyle">{{ emojiView.content }}</span>
+      </span>
+    </template>
+
+    <div v-if="!hasResults && data">
+      <emoji
+        :data="data"
+        emoji="sleuth_or_spy"
+        :native="emojiProps.native"
+        :skin="emojiProps.skin"
+        :set="emojiProps.set"
+      />
+      <div class="emoji-mart-no-results-label">{{ i18n.notfound }}</div>
+    </div>
   </div>
-
-  <template v-for="{ emojiObject, emojiView } in emojiObjects">
-    <span
-      v-if="emojiView.canRender"
-      :data-title="emojiObject.short_name"
-      :title="emojiView.title"
-      class="emoji-mart-emoji"
-      @mouseenter="emojiProps.onEnter(emojiView.getEmoji())"
-      @mouseleave="emojiProps.onLeave(emojiView.getEmoji())"
-      @click="emojiProps.onClick(emojiView.getEmoji())">
-      <span  :class="emojiView.cssClass" :style="emojiView.cssStyle">{{emojiView.content}}</span>
-    </span>
-  </template>
-
-  <div v-if="!hasResults && data">
-    <emoji
-      :data="data"
-      emoji="sleuth_or_spy"
-      :native="emojiProps.native"
-      :skin="emojiProps.skin"
-      :set="emojiProps.set"
-    />
-    <div class="emoji-mart-no-results-label">{{ i18n.notfound }}</div>
-  </div>
-</div>
-
 </template>
 
 <script>
 import { EmojiView } from '../utils/emoji-data'
-import Emoji from './Emoji'
+import Emoji from './Emoji.vue'
 import { defineComponent, computed } from 'vue'
 
 export default defineComponent({
-  name: 'EmojiCategory',
+  name: 'Category',
+
+  components: {
+    Emoji,
+  },
 
   props: {
     data: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     i18n: {
       type: Object,
-      required: true
+      required: true,
     },
     id: {
       type: String,
-      required: true
+      required: true,
     },
     name: {
       type: String,
-      required: true
+      required: true,
     },
     emojis: {
-      type: Array
+      type: Array,
     },
     emojiProps: {
       type: Object,
-      required: true
-    }
-  },
-
-  components: {
-    Emoji
+      required: true,
+    },
   },
 
   setup(props) {
@@ -90,7 +93,7 @@ export default defineComponent({
           props.emojiProps.native,
           props.emojiProps.fallback,
           props.emojiProps.emojiTooltip,
-          props.emojiProps.emojiSize,
+          props.emojiProps.emojiSize
         )
         return { emojiObject, emojiView }
       })
@@ -102,7 +105,6 @@ export default defineComponent({
       hasResults,
       emojiObjects,
     }
-  }
+  },
 })
-
 </script>

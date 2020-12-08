@@ -1,6 +1,6 @@
 <template>
   <div class="emoji-mart" :style="customStyles">
-    <div class="emoji-mart-bar emoji-mart-bar-anchors" v-if="showCategories">
+    <div v-if="showCategories" class="emoji-mart-bar emoji-mart-bar-anchors">
       <anchors
         :i18n="mergedI18n"
         :color="color"
@@ -29,10 +29,10 @@
 
     <category
       v-show="searchEmojis"
+      id="search"
       class="emoji-mart-search-results"
       :data="data"
       :i18n="mergedI18n"
-      id="search"
       name="Search"
       :emojis="searchEmojis"
       :emoji-props="emojiProps"
@@ -48,18 +48,17 @@
       :emit-update="true"
       @update="onScrollUpdate"
     >
-      <template #default="scope">
-        ========== {{ scope }} ========
-<!--        <DynamicScrollerItem :item="item" :active="active" :data-index="index">-->
-<!--          <Category-->
-<!--            v-show="true"-->
-<!--            :i18n="item.mergedI18n"-->
-<!--            :id="item.category.id"-->
-<!--            :name="item.category.name"-->
-<!--            :emojis="item.category.emojis"-->
-<!--            :emoji-props="item.emojiProps"-->
-<!--          />-->
-<!--        </DynamicScrollerItem>-->
+      <template #default="{ item, active, index }">
+        <DynamicScrollerItem :item="item" :active="active" :data-index="index">
+          <Category
+            v-show="true"
+            :id="item.category.id"
+            :i18n="item.mergedI18n"
+            :name="item.category.name"
+            :emojis="item.category.emojis"
+            :emoji-props="item.emojiProps"
+          />
+        </DynamicScrollerItem>
       </template>
     </DynamicScroller>
 
@@ -74,7 +73,7 @@
       :skin-props="skinProps"
       :on-skin-change="onSkinChange"
     >
-      <div class="emoji-mart-bar emoji-mart-bar-preview" v-if="showPreview">
+      <div v-if="showPreview" class="emoji-mart-bar emoji-mart-bar-preview">
         <preview
           :data="data"
           :title="title"
@@ -96,10 +95,10 @@ import store from '../utils/store'
 import frequently from '../utils/frequently'
 import { deepMerge, measureScrollbar } from '../utils'
 import { PickerProps } from '../utils/shared-props'
-import Anchors from './anchors'
-import Category from './category'
-import Preview from './preview'
-import Search from './search'
+import Anchors from './anchors.vue'
+import Category from './category.vue'
+import Preview from './preview.vue'
+import Search from './search.vue'
 
 /*
  * Note about `buffer` setting for DynamicScroller: this is a
@@ -145,14 +144,6 @@ const I18N = {
 export default defineComponent({
   name: 'Picker',
 
-  props: {
-    ...PickerProps,
-    data: {
-      type: Object,
-      required: true,
-    },
-  },
-
   components: {
     Anchors,
     Category,
@@ -160,6 +151,14 @@ export default defineComponent({
     Search,
     DynamicScroller,
     DynamicScrollerItem,
+  },
+
+  props: {
+    ...PickerProps,
+    data: {
+      type: Object,
+      required: true,
+    },
   },
 
   emits: ['select', 'skin-change'],
@@ -172,7 +171,7 @@ export default defineComponent({
     const searchEmojis = ref(null)
     const dynScrollerRef = ref(null)
 
-    categories = categories.filter(category => category.emojis.length > 0)
+    categories = categories.filter((category) => category.emojis.length > 0)
     categories[0].first = true
     Object.freeze(categories)
 
@@ -237,9 +236,9 @@ export default defineComponent({
       } catch (e) {
         console.error(
           'Default preview emoji `' +
-          props.emoji +
-          '` is not available, check the Picker `emoji` property',
-          e,
+            props.emoji +
+            '` is not available, check the Picker `emoji` property',
+          e
         )
         return props.data.firstEmoji()
       }
@@ -258,12 +257,12 @@ export default defineComponent({
       }
     }
     const onAnchorClick = (category) => {
-      let i = categories.findIndex(e => e.id === category.id)
+      let i = categories.findIndex((e) => e.id === category.id)
       if (dynScrollerRef.value) {
         dynScrollerRef.value.scrollToItem(i)
       }
 
-      activeCategory.value = categories.find(e => e.id === category.id)
+      activeCategory.value = categories.find((e) => e.id === category.id)
       skipScrollUpdate = true
     }
     const onSearch = (value) => {
@@ -304,6 +303,6 @@ export default defineComponent({
       skinProps,
       onSkinChange,
     }
-  }
+  },
 })
 </script>

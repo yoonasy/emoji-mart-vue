@@ -1,6 +1,6 @@
 <template>
   <div class="emoji-mart-search">
-    <input type="text" :placeholder="i18n.search" v-model="value">
+    <input v-model="value" type="text" :placeholder="i18n.search" />
   </div>
 </template>
 
@@ -11,34 +11,33 @@ export default defineComponent({
   props: {
     data: {
       type: Object,
-      required: true
+      required: true,
     },
     i18n: {
       type: Object,
-      required: true
+      required: true,
     },
     autoFocus: {
       type: Boolean,
-      default: false
+      default: false,
     },
     onSearch: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   },
+
+  emits: ['search'],
 
   setup(props, { emit }) {
     const value = ref('')
 
-    watch(
-      value,
-      () => emit('search', value.value)
-    )
+    watch(value, () => emit('search', value.value))
 
     onMounted(() => {
       if (!props.autoFocus) return
 
-      let $el = getCurrentInstance() && getCurrentInstance().proxy.$el || null
+      let $el = (getCurrentInstance() && getCurrentInstance().proxy.$el) || null
       if (!$el) return
 
       $el.querySelector('input').focus()
@@ -46,10 +45,9 @@ export default defineComponent({
 
     return {
       value,
-      clear:() => (value.value = ''),
-      emojiIndex: computed(() => props.data)
+      clear: () => (value.value = ''),
+      emojiIndex: computed(() => props.data),
     }
-  }
+  },
 })
-
 </script>

@@ -81,8 +81,7 @@ function deepFreeze(object) {
   // Freeze properties before freezing self
   for (let name of propNames) {
     let value = object[name]
-    object[name] =
-      value && typeof value === 'object' ? deepFreeze(value) : value
+    object[name] = value && typeof value === 'object' ? deepFreeze(value) : value
   }
   return Object.freeze(object)
 }
@@ -119,4 +118,4 @@ const uncompress = (data) => {
   return data
 }
 
-module.exports = { buildSearch, compress, uncompress }
+export { buildSearch, compress, uncompress }

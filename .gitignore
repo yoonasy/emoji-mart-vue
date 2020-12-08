@@ -7,3 +7,4 @@ report.html
 Session.vim
 coverage/
 yarn-error.log
+.idea/

@@ -95,14 +95,14 @@
     </div>
     <div class="row">
       <StaticPicker :data="index" :native="true">
-        <template slot="searchTemplate" slot-scope="slotProps">
+        <template v-slot:searchTemplate="slotProps" >
           <input
             type="text"
             :placeholder="slotProps.i18n.search"
             v-on:input="slotProps.onSearch($event.target.value)"
           />
         </template>
-        <template slot="previewTemplate" slot-scope="slotProps">
+        <template v-slot:previewTemplate="slotProps" >
           <div class="emoji-mart-preview">
             <div class="emoji-mart-preview-emoji">
               <Emoji
@@ -138,7 +138,7 @@
         emoji="flag-tf"
         :emojiSize="18"
         :data="indexFiltered"
-        ref="flags"
+        ref="flagsRef"
       />
     </div>
     <div class="row">
@@ -162,9 +162,11 @@
 </template>
 
 <script>
-import data from '../data/all.json'
-import { Picker, StaticPicker, Emoji, EmojiIndex } from '../src'
-import '../dist/emoji-mart.css'
+import data from '../../data/all.json'
+import {
+  Picker, StaticPicker, Emoji, EmojiIndex,
+} from '../../src'
+import '../../css/emoji-mart.css'
 import { defineComponent, computed, ref } from 'vue'
 
 // import { QBtn, QDialog } from 'quasar-framework/dist/quasar.mat.esm'
@@ -190,15 +192,13 @@ const CUSTOM_EMOJIS = [
   },
 ]
 
-let index = new EmojiIndex(data, {
+const index = new EmojiIndex(data, {
   custom: CUSTOM_EMOJIS,
 })
 
-let indexFiltered = new EmojiIndex(data, {
+const indexFiltered = new EmojiIndex(data, {
   custom: CUSTOM_EMOJIS,
-  emojisToShowFilter: (emoji) => {
-    return emoji.short_names[0].match(/^flag.*/) !== null
-  },
+  emojisToShowFilter: (emoji) => emoji.short_names[0].match(/^flag.*/) !== null,
 })
 
 const i18n = {
@@ -238,50 +238,51 @@ export default defineComponent({
   name: 'app',
 
   setup() {
+    const flagsRef = ref(null)
+    const isVisible = ref(true)
+    const flagsVisible = ref(true)
+    const emojisOutput = ref('')
     const activeSet = ref('native')
 
-    const native = computed(() => {
-      return activeSet.value === 'native'
-    })
+    const native = computed(() => activeSet.value === 'native')
     const smile = computed(() => {
       // Static emoji example
-      let emoji = index.findEmoji(':smile:')
+      const emoji = index.findEmoji(':smile:')
       // Note, that position in the emoji sheet is calculated by
       // `emoji` object
-      let style = `background-position: ${emoji.getPosition()}; background-image: url(https://unpkg.com/emoji-datasource-twitter@5.0.1/img/twitter/sheets-256/64.png); width: 24px; height: 24px; display: inline-block; background-size: 5700%`
+      const style = `background-position: ${emoji.getPosition()}; background-image: url(https://unpkg.com/emoji-datasource-twitter@5.0.1/img/twitter/sheets-256/64.png); width: 24px; height: 24px; display: inline-block; background-size: 5700%`
       return `<div class='emoji' style="${style}"></div>`
     })
-    const santaEmojiObject = computed(() => {
-      return index.findEmoji(':santa:')
-    })
+    const santaEmojiObject = computed(() => index.findEmoji(':santa:'))
 
     const toggleVisible = () => {
-      this.isVisible = !this.isVisible
+      isVisible.value = !isVisible.value
     }
     const toggleFlagsVisible = () => {
-      this.flagsVisible = !this.flagsVisible
-      if (!this.flagsVisible) {
-        this.$refs.flags.onAnchorClick(this.$refs.flags.categories[0])
+      flagsVisible.value = !flagsVisible.value
+      if (!flagsVisible.value) {
+        flagsRef.value.onAnchorClick(flagsRef.value.categories[0])
       }
     }
     const showEmoji = (emoji) => {
-      this.emojisOutput = this.emojisOutput + emoji.native
+      emojisOutput.value += emoji.native
     }
 
     return {
-      index: index,
-      indexFiltered: indexFiltered,
-      indexInclude: indexInclude,
-      indexI18n: indexI18n,
-      i18n: i18n,
+      flagsRef,
+      index,
+      indexFiltered,
+      indexInclude,
+      indexI18n,
+      i18n,
       activeSet,
       emoji: 'point_up',
       title: 'Pick your emoji…',
-      isVisible: true,
+      isVisible,
       emojiPickerDialog: false,
       emojiPickerCustomDialog: false,
-      emojisOutput: '',
-      flagsVisible: true,
+      emojisOutput,
+      flagsVisible,
       native,
       smile,
       santaEmojiObject,

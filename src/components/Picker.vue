@@ -48,17 +48,18 @@
       :emit-update="true"
       @update="onScrollUpdate"
     >
-      <template v-slot="{ item, active, index }">
-        <DynamicScrollerItem :item="item" :active="active" :data-index="index">
-          <Category
-            v-show="true"
-            :i18n="item.mergedI18n"
-            :id="item.category.id"
-            :name="item.category.name"
-            :emojis="item.category.emojis"
-            :emoji-props="item.emojiProps"
-          />
-        </DynamicScrollerItem>
+      <template #default="scope">
+        ========== {{ scope }} ========
+<!--        <DynamicScrollerItem :item="item" :active="active" :data-index="index">-->
+<!--          <Category-->
+<!--            v-show="true"-->
+<!--            :i18n="item.mergedI18n"-->
+<!--            :id="item.category.id"-->
+<!--            :name="item.category.name"-->
+<!--            :emojis="item.category.emojis"-->
+<!--            :emoji-props="item.emojiProps"-->
+<!--          />-->
+<!--        </DynamicScrollerItem>-->
       </template>
     </DynamicScroller>
 

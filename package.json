@@ -2,6 +2,7 @@
   "name": "emoji-mart-vue3-fast",
   "version": "0.0.1",
   "description": "Customizable Slack-like emoji picker for Vue3, fast version",
+  "module": "dist/emoji-mart.js",
   "main": "dist/emoji-mart.js",
   "repository": {
     "type": "git",
@@ -27,7 +28,7 @@
     "vue3-virtual-scroller": "^0.1.1"
   },
   "peerDependencies": {
-    "vue": "^2.0.0"
+    "vue": "^3.0.4"
   },
   "devDependencies": {
     "sass": "^1.28.0",
@@ -66,9 +67,9 @@
     "build:data-debug": "node --inspect=0.0.0.0:9230 --inspect-brk scripts/build-data",
     "build:dist": "webpack --config src/webpack.config.js",
     "build:dist-stats": "webpack --config src/webpack.config.js --profile --json > stats.json",
-    "build:docs": "webpack --config docs/webpack.config.js",
+    "build:docs": "webpack --config docs-src/webpack.config.js",
     "build": "npm run clean && npm run build:data && npm run build:dist",
-    "dev:docs": "cd docs && vue-cli-service serve",
+    "dev:docs": "webpack --config src/webpack.config.js",
     "start": "npm run dev:docs",
     "stats": "webpack --config ./spec/webpack.config.js --json > spec/stats.json",
     "size-limit": "size-limit",

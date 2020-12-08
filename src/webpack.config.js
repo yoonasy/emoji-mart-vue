@@ -18,7 +18,8 @@ module.exports = Object.assign(
       globalObject: "typeof self !== 'undefined' ? self : this",
     },
 
-    externals: !TEST && [
+    externals: [
+      'vue',
       {
         vue: {
           root: 'Vue',
@@ -84,6 +85,7 @@ module.exports = Object.assign(
        **/
       alias: {
         '../data': path.resolve(__dirname, '../data/'),
+        'vue$': path.resolve(__dirname, 'docs-src/node_modules/vue')
       },
     },
 

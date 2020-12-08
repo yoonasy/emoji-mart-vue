@@ -15,7 +15,11 @@
     "emoji",
     "picker"
   ],
-  "files": ["dist", "data", "css"],
+  "files": [
+    "dist",
+    "data",
+    "css"
+  ],
   "author": "Etienne Lemay",
   "license": "BSD-3-Clause",
   "bugs": {
@@ -53,7 +57,7 @@
     "size-limit": "^0.11.4",
     "typescript": "^3.9.7",
     "url-loader": "^0.5.8",
-    "vue": "^3.0.4",
+    "vue": "3.0.4",
     "vue-jest": "^5.0.0-0",
     "vue-loader": "^16.1.1",
     "vue-style-loader": "^4.1.2",
@@ -66,6 +70,7 @@
     "build:data": "node scripts/build-data",
     "build:data-debug": "node --inspect=0.0.0.0:9230 --inspect-brk scripts/build-data",
     "build:dist": "webpack --config src/webpack.config.js",
+    "build:dist-watch": "webpack -w --config src/webpack.config.js",
     "build:dist-stats": "webpack --config src/webpack.config.js --profile --json > stats.json",
     "build:docs": "webpack --config docs-src/webpack.config.js",
     "build": "npm run clean && npm run build:data && npm run build:dist",

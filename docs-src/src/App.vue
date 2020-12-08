@@ -165,10 +165,11 @@
 import data from '../../data/all.json'
 import {
   Picker, StaticPicker, Emoji, EmojiIndex,
-} from '../../src'
+} from '../..'
 import '../../css/emoji-mart.css'
 import { defineComponent, computed, ref } from 'vue'
 
+console.log(Picker)
 // import { QBtn, QDialog } from 'quasar-framework/dist/quasar.mat.esm'
 
 const CUSTOM_EMOJIS = [
@@ -237,6 +238,12 @@ const indexInclude = new EmojiIndex(data, {
 export default defineComponent({
   name: 'app',
 
+  components: {
+    Picker,
+    StaticPicker,
+    Emoji,
+  },
+
   setup() {
     const flagsRef = ref(null)
     const isVisible = ref(true)
@@ -245,14 +252,14 @@ export default defineComponent({
     const activeSet = ref('native')
 
     const native = computed(() => activeSet.value === 'native')
-    const smile = computed(() => {
+    const smile = computed(() =>
       // Static emoji example
-      const emoji = index.findEmoji(':smile:')
+      // const emoji = index.findEmoji(':smile:')
       // Note, that position in the emoji sheet is calculated by
       // `emoji` object
-      const style = `background-position: ${emoji.getPosition()}; background-image: url(https://unpkg.com/emoji-datasource-twitter@5.0.1/img/twitter/sheets-256/64.png); width: 24px; height: 24px; display: inline-block; background-size: 5700%`
-      return `<div class='emoji' style="${style}"></div>`
-    })
+      // const style = `background-position: ${emoji.getPosition()}; background-image: url(https://unpkg.com/emoji-datasource-twitter@5.0.1/img/twitter/sheets-256/64.png); width: 24px; height: 24px; display: inline-block; background-size: 5700%`
+      // eslint-disable-next-line implicit-arrow-linebreak
+      '<div class="emoji" style=""></div>')
     const santaEmojiObject = computed(() => index.findEmoji(':santa:'))
 
     const toggleVisible = () => {
@@ -290,12 +297,6 @@ export default defineComponent({
       toggleFlagsVisible,
       showEmoji,
     }
-  },
-
-  components: {
-    Picker,
-    StaticPicker,
-    Emoji,
   },
 })
 </script>

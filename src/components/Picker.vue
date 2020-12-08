@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import '../vendor/raf-polyfill'
+import '../polyfills/animationFrame'
 import store from '../utils/store'
 import frequently from '../utils/frequently'
 import { deepMerge, measureScrollbar } from '../utils'
